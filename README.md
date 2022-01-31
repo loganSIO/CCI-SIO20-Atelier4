@@ -1,7 +1,27 @@
 # CCI-SIO20-Atelier4
 
-Description de l'application :
+**ePhony**
 
-Application qui ressemble à une recherche d’emploi pour les musiciens. Les membres d’un groupe qui cherchent à occuper un poste, qu’il s’agisse d’un chanteur, d’un batteur ou d’un guitariste, peuvent le trouver ici.
 
-Bien sûr, les musiciens qui veulent rejoindre un groupe peuvent rechercher les différents groupes enregistrés sur l’application et choisir ceux qu’ils veulent rejoindre. 
+
+Vous êtes musicien et vous souhaitez rejoindre un groupe ? Mieux, vous êtes un groupe, mais il vous manque un guitariste ? Alors **ePhony** est fait pour vous !
+
+
+
+**ePhony** est une application mobile de recherche de musiciens basée sur un système de recherche avec des filtres personnalisés.
+
+
+
+L’objectif de **ePhony** est de faire des rencontres musicales à travers la France, ou localement.
+
+
+
+La recherche de musiciens sur l’application se fait par un procédé de recherche par thèmes, instruments, ville. Lorsqu’une recherche est effectuée, les profils d’utilisateurs les plus récents ressortent en première page.
+
+
+
+Il est possible d’envoyer un message à un utilisateur depuis son profil dans l’objectif d’échanger avec lui.
+
+
+
+L’application n’est en aucun cas une application de gestion de groupe.
