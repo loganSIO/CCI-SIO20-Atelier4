@@ -4,10 +4,10 @@ import { AuthProvider } from './hooks/useAuth';
 
 export default function App() {
   return (
-  <NavigationContainer>
-    <AuthProvider>
-      <StackNavigator />
-    </AuthProvider>
-  </NavigationContainer>
+    <NavigationContainer>
+      <AuthProvider>
+        <StackNavigator />
+      </AuthProvider>
+    </NavigationContainer>
   );
 }
