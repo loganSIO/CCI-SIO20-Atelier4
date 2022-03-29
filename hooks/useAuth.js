@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import
+  React,
+  { createContext,
+    useContext,
+    useState,
+    useEffect,
+    useMemo
+} from 'react';
 import { auth } from "../firebase";
 import * as Google from "expo-google-app-auth";
 import {
@@ -20,18 +27,35 @@ const config = {
 export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-  }, []);
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUser(user);
+        } else {
+          setUser(null);
+        }
+
+
+        setLoadingInitial(false);
+      }),
+    []
+  );
+
+  const logout = () => {
+    setLoading(true);
+
+    signOut(auth)
+    .catch(error => setError(error))
+    .finally(() => setLoading(true));
+  }
 
   const signInWithGoogle = async() => {
+    setLoading(true);
+
     await Google.logInAsync(config).then(async (logInResult) => {
       if(logInResult.type === "success") {
         // login
@@ -43,17 +67,25 @@ export const AuthProvider = ({ children }) => {
 
       return Promise.reject();
     })
-    .catch(error => setError(error));
+    .catch(error => setError(error))
+    .finally(() => setLoading(false));
   };
+
+  const memoedValue = useMemo(
+    () => ({
+      user: user,
+      loading: loading,
+      error: error,
+      signInWithGoogle: signInWithGoogle,
+      logout: logout,
+    }),
+    [user, loading, error]
+  );
 
   return (
     <AuthContext.Provider
-      value={{
-        user: user,
-        signInWithGoogle: signInWithGoogle,
-      }}
-    >
-      {children}
+      value={memoedValue}>
+      {!loadingInitial && children}
     </AuthContext.Provider>
   );
 };
