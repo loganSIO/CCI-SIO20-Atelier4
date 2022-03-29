@@ -12,18 +12,16 @@ const StackNavigator = () => {
 
   return (
     <Stack.Navigator>
-      {/* Vérifie si l'utilisateur est est connecté en
-      protégeant les pages suivantes */}
       {user ? (
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
         </>
-      ) : (
+        ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
-      )}
+        )}
     </Stack.Navigator>
-  )
-}
+  );
+};
 
-export default StackNavigator
+export default StackNavigator;
