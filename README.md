@@ -19,4 +19,4 @@ L’application n’est en aucun cas une application de gestion de groupe.
 Expo v5.0.3
 Nodejs v12.22.5
 Node v14.18.3
-Firebase v9.6.10
+Firebase v9.1.2
