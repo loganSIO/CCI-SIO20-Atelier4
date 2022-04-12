@@ -103,6 +103,7 @@ const ModalScreen = () => {
         value={skill}
         onChangeText={setSkill}
         style={tw("text-center pb-2")}
+        keyboardType="numeric"
         maxLength={3}
         placeholder="Estimation de ton niveau de 1 à 5"
       />
