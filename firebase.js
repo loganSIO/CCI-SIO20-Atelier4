@@ -12,12 +12,12 @@ const firebaseConfig = {
   projectId: "ephonyapp",
   storageBucket: "ephonyapp.appspot.com",
   messagingSenderId: "1033034459895",
-  appId: "1:1033034459895:web:eabd42e525920ddfc941f2"
+  appId: "1:1033034459895:web:f74940768095accac941f2"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
-const db = getFirestore();
+const db = getFirestore(app);
 
 export { auth, db }
