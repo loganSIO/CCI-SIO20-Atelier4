@@ -6,7 +6,7 @@ import {
   Image,
   StyleSheet
 } from 'react-native'
-import React, { useRef } from 'react'
+import React, { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import useAuth from "../hooks/useAuth";
 // Importation via react-native-safe-area-context, sinon
@@ -16,6 +16,8 @@ import tw from 'tailwind-rn';
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
 import { Touchable } from 'react-native-web';
+import { onSnapshot, doc, collection, setDoc, query, where, getDocs } from 'firebase/firestore';
+import { db } from "../firebase";
 
 // Data provisoire pour test
 
@@ -65,7 +67,70 @@ const CARD_DATA = [
 const HomeScreen = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+  const [ profiles, setProfiles ] = useState([]);
   const swipeRef = useRef(null);
+
+  useLayoutEffect(
+    () =>
+      onSnapshot(doc(db, 'users', user.uid), snapshot => {
+        if (!snapshot.exists()) {
+          navigation.navigate("Modal");
+        }
+      }),
+    []
+  );
+
+  useEffect(() => {
+    let unsub;
+
+    const fetchCards = async () => {
+
+      const passes = await getDocs(collection(db, 'users', user.uid, 'no')).then
+      (snapshot => snapshot.docs.map(doc => doc.id))
+
+      const rockit = await getDocs(collection(db, 'users', user.uid, 'rockit')).then
+      (snapshot => snapshot.docs.map(doc => doc.id))
+
+      const passedUserIds = passes.length > 0 ? passes : ['test'];
+      const rockitUserIds = rockit.length > 0 ? rockit : ['test'];
+
+      unsub = onSnapshot(query(collection(db, 'users'), where('id', 'not-in', [...passedUserIds, ...rockitUserIds])), snapshot => {
+        setProfiles(
+          snapshot.docs.filter(doc => doc.id !== user.uid).map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          )
+      })
+    }
+
+    fetchCards();
+    return unsub
+  }, [db]);
+
+  const swipeLeft = (cardIndex) => {
+    if (!profiles[cardIndex]) return;
+
+    const userSwiped = profiles[cardIndex];
+    console.log(`Vous avez passé : ${userSwiped.displayName}`);
+
+    setDoc(doc(db, 'users', user.uid, 'no', userSwiped.id),
+    userSwiped)
+  }
+
+  const swipeRight = async (cardIndex) => {
+    if (!profiles[cardIndex]) return;
+
+    const userSwiped = profiles[cardIndex];
+    console.log(`Vous avez choisi ce musicien : ${userSwiped.displayName}`);
+
+    setDoc(doc(db, 'users', user.uid, 'rockit', userSwiped.id),
+    userSwiped)
+
+    // const loggedInProfile = await (
+    //   await getDoc(doc(db, 'users', user.uid))
+    // ).data();
+  };
 
   return (
     <SafeAreaView style={tw("flex-1")}>
@@ -95,11 +160,13 @@ const HomeScreen = () => {
       <View style={tw('flex-1 -mt-6')}>
         <Swiper
           ref={swipeRef}
-          onSwipedLeft={() => {
+          onSwipedLeft={(cardIndex) => {
             console.log('Swipe non')
+            swipeLeft(cardIndex);
           }}
-          onSwipedRight={() => {
+          onSwipedRight={(cardIndex) => {
             console.log('Swipe oui!')
+            swipeRight(cardIndex);
           }}
           overlayLabels={{
             left: {
@@ -126,8 +193,8 @@ const HomeScreen = () => {
           verticalSwipe={false}
           animateCardOpacity
           containerStyle={{ backgroundColor: "transparent" }}
-          cards={CARD_DATA}
-          renderCard={(card) => (
+          cards={profiles}
+          renderCard={(card) => card ? (
             <View
               key={card.id}
               style={tw('relative bg-white h-3/4 rounded-xl')}>
@@ -144,7 +211,7 @@ const HomeScreen = () => {
 
                 <View>
                   <Text style={tw('text-2xl font-bold')}>
-                    {card.firstName}
+                    {card.displayName}
                   </Text>
                   <Text style={tw('font-bold')}>
                     {card.country}
@@ -155,8 +222,25 @@ const HomeScreen = () => {
                 </View>
 
             </View>
-          )
-          }
+          ) : (
+            <View
+              style={[
+                tw(
+                  'relative bg-white h-3/4 rounded-xl justify-center items-center'
+                ),
+                styles.cardShadow,
+              ]}
+            >
+              <Text style={tw('font-bold pb-5')}>Plus de musiciens de disponibles</Text>
+
+              <Image
+                style={tw('h-20 w-full')}
+                height={100}
+                width={100}
+                // Ajout d'une image
+              />
+            </View>
+          )}
         />
       </View>
 
