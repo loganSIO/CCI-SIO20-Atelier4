@@ -13,9 +13,9 @@ const ModalScreen = () => {
   const [description, setDescription] = useState(null);
   const [instrument, setInstrument] = useState(null);
   const [genre, setGenre] = useState(null);
-  const [skill, setSkill] = useState(null);
+  // const [skill, setSkill] = useState(null);
 
-  const incompleteForm = !country || !description || !instrument || !genre || !skill;
+  const incompleteForm = !country || !description || !instrument || !genre;
 
   const updateUserProfile = () => {
     setDoc(doc(db, "users", user.uid), {
@@ -26,7 +26,7 @@ const ModalScreen = () => {
       description: description,
       instrument: instrument,
       genre: genre,
-      skill: skill,
+      // skill: skill,
       timestamp: serverTimestamp(),
     })
       .then(() => {
@@ -96,7 +96,7 @@ const ModalScreen = () => {
         placeholder="Genre(s) musical"
       />
 
-      <Text style={tw('text-center p-4 font-bold')}>
+      {/* <Text style={tw('text-center p-4 font-bold')}>
         5. Niveau
       </Text>
       <TextInput
@@ -106,7 +106,7 @@ const ModalScreen = () => {
         keyboardType="numeric"
         maxLength={3}
         placeholder="Estimation de ton niveau de 1 à 5"
-      />
+      /> */}
 
       <TouchableOpacity
         disabled={incompleteForm}

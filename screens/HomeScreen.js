@@ -144,14 +144,14 @@ const HomeScreen = () => {
           // créer un match
           setDoc(doc(db, 'rockedit', generateId(user.uid, userSwiped.id)), {
             users: {
-              [user.uid] : loggedInProfile,
+              [user.uid]: loggedInProfile,
               [userSwiped.id]: userSwiped
             },
             usersRockedIt: [user.uid, userSwiped.id],
             timestamp: serverTimestamp(),
           });
 
-          navigation.navigate('RockedItScreen', {
+          navigation.navigate('RockedIt', {
             loggedInProfile,
             userSwiped,
           });
