@@ -16,8 +16,9 @@ import tw from 'tailwind-rn';
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
 import { Touchable } from 'react-native-web';
-import { onSnapshot, doc, collection, setDoc, query, where, getDocs } from 'firebase/firestore';
+import { onSnapshot, doc, collection, setDoc, query, where, getDocs, getDoc, documentSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from "../firebase";
+import generateId from "../lib/generated";
 
 // Data provisoire pour test
 
@@ -122,14 +123,50 @@ const HomeScreen = () => {
     if (!profiles[cardIndex]) return;
 
     const userSwiped = profiles[cardIndex];
-    console.log(`Vous avez choisi ce musicien : ${userSwiped.displayName}`);
+    const loggedInProfile = await (
+      await getDoc(doc(db, 'users', user.uid))
+    ).data();
 
-    setDoc(doc(db, 'users', user.uid, 'rockit', userSwiped.id),
-    userSwiped)
+    // Vérifier si l'utilisateur a swipe sur toi
+    getDoc(doc(db, 'users', userSwiped.id, 'rockit', user.uid)).then(
+      (documentSnapshot) => {
 
-    // const loggedInProfile = await (
-    //   await getDoc(doc(db, 'users', user.uid))
-    // ).data();
+        if (documentSnapshot.exists()) {
+          // utilisateur a matché avec toi avant que toi tu matches avec lui
+          // créer un match
+          console.log(`You rocked it with ${userSwiped.displayName}`);
+
+          setDoc(
+            doc(db, 'users', user.uid, 'rockit', userSwiped.id),
+            userSwiped
+          );
+
+          // créer un match
+          setDoc(doc(db, 'rockedit', generateId(user.uid, userSwiped.id)), {
+            users: {
+              [user.uid] : loggedInProfile,
+              [userSwiped.id]: userSwiped
+            },
+            usersRockedIt: [user.uid, userSwiped.id],
+            timestamp: serverTimestamp(),
+          });
+
+          navigation.navigate('RockedItScreen', {
+            loggedInProfile,
+            userSwiped,
+          });
+        } else {
+          // un utilisateur a swipe en premier ou n'a pas swipe
+            console.log(
+              `Vous avez choisi ce musicien : ${userSwiped.displayName}`
+            );
+            setDoc(
+              doc(db, 'users', user.uid, 'rockit', userSwiped.id),
+              userSwiped
+            );
+        }
+      }
+    );
   };
 
   return (
