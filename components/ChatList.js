@@ -15,8 +15,8 @@ const ChatList = () => {
     () =>
       onSnapshot(
         query(
-          collection(db, 'matches'),
-          where('usersMatched', 'array-contains', user.uid)
+          collection(db, 'rockedit'),
+          where('usersRockedIt', 'array-contains', user.uid)
         ),
         (snapshot) =>
           setMatches(
