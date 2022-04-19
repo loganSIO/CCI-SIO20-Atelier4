@@ -4,8 +4,7 @@ import
     useContext,
     useState,
     useEffect,
-    useMemo
-} from 'react';
+    useMemo } from 'react';
 import { auth } from "../firebase";
 import * as Google from "expo-google-app-auth";
 import {

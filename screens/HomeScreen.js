@@ -16,7 +16,17 @@ import tw from 'tailwind-rn';
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import Swiper from "react-native-deck-swiper";
 import { Touchable } from 'react-native-web';
-import { onSnapshot, doc, collection, setDoc, query, where, getDocs, getDoc, documentSnapshot, serverTimestamp } from 'firebase/firestore';
+import {
+  onSnapshot,
+  doc,
+  collection,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  documentSnapshot,
+  serverTimestamp } from 'firebase/firestore';
 import { db } from "../firebase";
 import generateId from "../lib/generated";
 
