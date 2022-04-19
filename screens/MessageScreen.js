@@ -30,7 +30,7 @@ const MessageScreen = () => {
           setMessages(
             snapshot.docs.map((doc) => ({
               id: doc.id,
-              ...doc.data()
+              ...doc.data(),
             }))
           )
       ),
@@ -38,7 +38,6 @@ const MessageScreen = () => {
   );
 
   const sendMessage = () => {
-    console.log(user.user.displayName)
     addDoc(collection(db, "rockedit", matchDetails.id, 'messages'), {
       timestamp: serverTimestamp(),
       userId: user.user.uid,
@@ -62,10 +61,11 @@ const MessageScreen = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <FlatList
             data={messages}
+            inverted={-1}
             style={tw('pl-4')}
             keyExtractor={(item) => item.id}
             renderItem={({ item: message }) =>
-                message.userId === user.uid ? (
+                message.userId === user.user.uid ? (
                   <SenderMessage key={message.id} message={message} />
                 ) : (
                   <ReceiverMessage key={message.id} message={message} />
