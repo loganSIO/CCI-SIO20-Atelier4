@@ -1,12 +1,15 @@
-import { View, Text, TextInput, Button, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TextInput, Button, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, FlatList } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import Header from "../components/Header";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import getMatchedUserInfo from '../lib/getMatchedUserInfo';
 import useAuth from "../hooks/useAuth";
 import { useRoute } from '@react-navigation/native'
 import tw from "tailwind-rn";
-import { FlatList } from 'react-native-web';
+import SenderMessage from '../components/SenderMessage';
+import ReceiverMessage from '../components/ReceiverMessage';
+import { addDoc, collection, onSnapshot, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { db } from "../firebase";
 
 const MessageScreen = () => {
   const user = useAuth();
@@ -16,7 +19,36 @@ const MessageScreen = () => {
 
   const { matchDetails } = params;
 
-  const sendMessage = () => {};
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, 'rockedit', matchDetails.id, 'messages'),
+          orderBy('timestamp', 'desc')
+        ),
+        (snapshot) =>
+          setMessages(
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data()
+            }))
+          )
+      ),
+    [matchDetails, db]
+  );
+
+  const sendMessage = () => {
+    console.log(user.user.displayName)
+    addDoc(collection(db, "rockedit", matchDetails.id, 'messages'), {
+      timestamp: serverTimestamp(),
+      userId: user.user.uid,
+      displayName: user.user.displayName,
+      photoURL: user.user.photoURL,
+      message: input,
+    });
+
+    setInput("");
+  };
 
   return (
     <SafeAreaView style={tw('flex-1')}>
@@ -31,9 +63,9 @@ const MessageScreen = () => {
           <FlatList
             data={messages}
             style={tw('pl-4')}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) =>
-                messages.userId === user.uid ? (
+            keyExtractor={(item) => item.id}
+            renderItem={({ item: message }) =>
+                message.userId === user.uid ? (
                   <SenderMessage key={message.id} message={message} />
                 ) : (
                   <ReceiverMessage key={message.id} message={message} />
